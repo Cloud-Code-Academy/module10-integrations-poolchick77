@@ -16,13 +16,20 @@
  * 
  * Optional Challenge: Use a trigger handler class to implement the trigger logic.
  */
-trigger ContactTrigger on Contact(before insert) {
-	// When a contact is inserted
-	// if DummyJSON_Id__c is null, generate a random number between 0 and 100 and set this as the contact's DummyJSON_Id__c value
 
-	//When a contact is inserted
-	// if DummyJSON_Id__c is less than or equal to 100, call the getDummyJSONUserFromId API
+
+trigger ContactTrigger on Contact(before insert, after update) {
+	// When a contact is inserted
+	if (Trigger.isBefore && Trigger.isInsert) {
+		ContactTriggerHandler.setJSONId(Trigger.new);
+	}
+
+	if (Trigger.isAfter && Trigger.isInsert) {
+		ContactTriggerHandler.startJSONCalloutGetUser(Trigger.new);
+	}
 
 	//When a contact is updated
-	// if DummyJSON_Id__c is greater than 100, call the postCreateDummyJSONUser API
+	if (Trigger.IsAfter && Trigger.isUpdate) {
+		ContactTriggerHandler.startJSONCalloutCreateUser(Trigger.new);
+	}
 }
